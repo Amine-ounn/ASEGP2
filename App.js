@@ -2,12 +2,13 @@ import React from 'react';
 import {useEffect} from 'react';
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Platform, View} from 'react-native';
 
 const App = () => {
   useEffect(() => {
     const handleLocationPermission = async () => {
       let checkIfGranted = '';
+
       if (Platform.OS === 'ios') {
         checkIfGranted = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
 
@@ -15,9 +16,7 @@ const App = () => {
           checkIfGranted === RESULTS.BLOCKED ||
           checkIfGranted === RESULTS.DENIED
         ) {
-          const makeRequest = await request(
-            PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-          );
+          await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
         }
       }
       if (Platform.OS === 'android') {
@@ -27,14 +26,14 @@ const App = () => {
           checkIfGranted === RESULTS.BLOCKED ||
           checkIfGranted === RESULTS.DENIED
         ) {
-          const makeRequest = await request(
-            PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-          );
+          await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
         }
       }
     };
+
     handleLocationPermission();
   }, []);
+
   return (
     <View style={styles.container}>
       <MapView
@@ -59,7 +58,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    flex: 1,
   },
   map: {
     ...StyleSheet.absoluteFillObject,
