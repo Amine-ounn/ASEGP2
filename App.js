@@ -76,23 +76,24 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     position: 'absolute',
-    width: '100%',
-    minHeight: 100,
+    width: '40%',
+    minHeight: 0,
     backgroundColor: '#fff',
-    top: 0,
-    left: 0,
+    justifyContent: "center",
     zIndex: 1,
-    padding: 20,
+    padding: 5,
   },
   modal: {
     flex: 1,
-    marginTop: 50,
+    justifyContent: "center",
+   
   },
   title: {
     fontSize: 20,
+    color: "red",
   },
   coordinates: {
-    fontSize: 20,
+    fontSize: 13,
     color: 'gray',
   },
 });
