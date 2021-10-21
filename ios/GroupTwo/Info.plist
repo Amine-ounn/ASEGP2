@@ -37,6 +37,8 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Grant location access to show your location</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Grant location access to show your location</string>
 	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
   <dict>
     <key>YOUR-PURPOSE-KEY</key>
