@@ -1,5 +1,5 @@
 import React from 'react';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {StyleSheet, Platform, View, Text, Alert} from 'react-native';
@@ -11,7 +11,7 @@ const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = 0.0121;
 
 const App = () => {
-  const [location, setLocation] = React.useState({
+  const [location, setLocation] = useState({
     latitude: LATITUDE,
     longitude: LONGITUDE,
   });
@@ -53,6 +53,7 @@ const App = () => {
     };
 
     handleLocationPermission();
+    getCurrentLocation();
   }, []);
 
   const getCurrentLocation = () => {
@@ -117,18 +118,17 @@ const styles = StyleSheet.create({
     width: '40%',
     minHeight: 0,
     backgroundColor: '#fff',
-    justifyContent: "center",
+    justifyContent: 'center',
     zIndex: 1,
     padding: 5,
   },
   modal: {
     flex: 1,
-    justifyContent: "center",
-   
+    justifyContent: 'center',
   },
   title: {
     fontSize: 20,
-    color: "red",
+    color: 'red',
   },
   coordinates: {
     fontSize: 13,
