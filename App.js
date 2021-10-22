@@ -111,27 +111,27 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+    height: '88%',
   },
   modalContainer: {
     flex: 1,
     position: 'absolute',
-    width: '40%',
+    height: '12%',
+    width: '100%',
     minHeight: 0,
     backgroundColor: '#fff',
-    justifyContent: 'center',
     zIndex: 1,
-    padding: 5,
+    padding: 10,
   },
   modal: {
     flex: 1,
-    justifyContent: 'center',
   },
   title: {
     fontSize: 20,
     color: 'red',
   },
   coordinates: {
-    fontSize: 13,
+    fontSize: 15,
     color: 'gray',
   },
 });
