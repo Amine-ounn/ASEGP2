@@ -54,11 +54,30 @@ const App = () => {
 
     handleLocationPermission();
     getCurrentLocation();
-  }, []);
+    trackUserLocation();
+  });
 
   const getCurrentLocation = () => {
     // will give you the current location
-    Geolocation.getCurrentPosition(
+    const id = Geolocation.getCurrentPosition(
+      position => {
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      error => {
+        Alert.alert(error.message);
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 5000},
+    );
+
+    return id;
+  };
+
+  const trackUserLocation = () => {
+    // will track the user location
+    Geolocation.watchPosition(
       position =>
         setLocation({
           latitude: position.coords.latitude,
