@@ -93,8 +93,8 @@ const App = () => {
   
  const params = JSON.stringify({
 
-"latitude": latitude,
-"longitude": longitude,
+"latitude": position.coords.latitude,
+"longitude": position.coords.longitude,
 
 });
   
