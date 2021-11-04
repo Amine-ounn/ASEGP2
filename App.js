@@ -93,13 +93,14 @@ const App = () => {
   
  const params = JSON.stringify({
 
-"latitude": position.coords.latitude,
-"longitude": position.coords.longitude,
+"lat": position.coords.latitude,
+"lng": position.coords.longitude,
+"MAC": ,   
 
 });
   
  // Send a POST request
-axios.post(url, params,{
+axios.post("https://ase2task3.herokuapp.com/api/create_locations/", params,{
 
 "headers": {
 
