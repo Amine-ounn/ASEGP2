@@ -69,9 +69,9 @@ const App = () => {
  
  // Send a POST request
 axios.post('https://ase2task3.herokuapp.com/api/create_locations/',{ 
-          "lat": position.coords.latitude,
-          "lng":  position.coords.longitude,
-          "MAC": 'XD3254DQ',
+          lat: position.coords.latitude,
+          lng:  position.coords.longitude,
+          MAC: 'XD3254DQ',
         },{
 
 "headers": {
