@@ -66,6 +66,24 @@ const App = () => {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         });
+        const params = JSON.stringify({
+
+"lat": latitude,
+"lng": longitude,
+"MAC": 'XD3254DQ',   
+
+});
+  
+ // Send a POST request
+axios.post("https://ase2task3.herokuapp.com/api/create_locations/", params,{
+
+"headers": {
+
+"content-type": "application/json",
+
+},
+
+}); 
       },
       error => {
         Alert.alert(error.message);
@@ -84,6 +102,7 @@ const App = () => {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         }),
+      
       error => {
         Alert.alert(error.message);
       },
@@ -91,24 +110,7 @@ const App = () => {
     );
   };
   
- const params = JSON.stringify({
-
-"lat": position.coords.latitude,
-"lng": position.coords.longitude,
-"MAC": 'XD3254DQ',   
-
-});
-  
- // Send a POST request
-axios.post("https://ase2task3.herokuapp.com/api/create_locations/", params,{
-
-"headers": {
-
-"content-type": "application/json",
-
-},
-
-}); 
+ 
   return (
     <View style={styles.container}>
       <MapView
