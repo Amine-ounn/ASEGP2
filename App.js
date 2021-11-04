@@ -80,7 +80,8 @@ axios.post('https://ase2task3.herokuapp.com/api/create_locations/',{
 
 },
 
-}); 
+}).then(res => {})
+.catch(err => {console.log(err);}); 
       },
       error => {
         Alert.alert(error.message);
