@@ -95,7 +95,7 @@ const App = () => {
 
 "lat": position.coords.latitude,
 "lng": position.coords.longitude,
-"MAC": ,   
+"MAC": 'XD3254DQ',   
 
 });
   
