@@ -67,17 +67,11 @@ const App = () => {
           longitude: position.coords.longitude,
         });
  
-  
- /* const params = JSON.stringify({
-
-"lat": latitude,
-"lng": longitude,
-"MAC": 'XD3254DQ',   */
  // Send a POST request
-axios.post('https://ase2task3.herokuapp.com/api/create_locations/', 
-          lat: position.coords.latitude,
-          lng:  position.coords.longitude,
-          mac: 'XD3254DQ',
+axios.post('https://ase2task3.herokuapp.com/api/create_locations/',{ 
+          "lat": position.coords.latitude,
+          "lng":  position.coords.longitude,
+          "MAC": 'XD3254DQ',
         },{
 
 "headers": {
