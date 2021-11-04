@@ -5,6 +5,7 @@ import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {StyleSheet, Platform, View, Text, Alert} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
+import {getUniqueId} from 'react-native-device-info';
 
 const LATITUDE = 50.8677;
 const LONGITUDE = 50.8677;
@@ -28,6 +29,8 @@ const App = () => {
   });
 
   useEffect(() => {
+    const deviceId = getUniqueId();
+
     // send location to server
     const sendLocation = async () => {
       const {latitude, longitude} = location;
@@ -36,7 +39,7 @@ const App = () => {
         .post('https://ase2task3.herokuapp.com/api/create_locations/', {
           lat: latitude,
           lng: longitude,
-          MAC: '123dslkd23',
+          MAC: deviceId,
         })
         .then(res => {})
         .catch(err => {
@@ -47,7 +50,6 @@ const App = () => {
           ]);
         });
     };
-    console.log('location changed', location);
 
     sendLocation();
   }, [location]);
