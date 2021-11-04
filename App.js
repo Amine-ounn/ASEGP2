@@ -4,7 +4,7 @@ import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {StyleSheet, Platform, View, Text, Alert} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-import axios from ‘axios’;
+import axios from 'axios';
 
 const LATITUDE = 50.8677;
 const LONGITUDE = 50.8677;
