@@ -154,7 +154,6 @@ const App = () => {
             <Text style={styles.title}>Coordinates</Text>
             <Text style={styles.coordinates}>
               {location.latitude}, {location.longitude}
-            
             </Text>
           </View>
           <View>
@@ -207,13 +206,12 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   lastUpdateLabel: {
-    fontSize: 15,
     textAlign: 'left',
     color: 'gray',
   },
   lastUpdate: {
     textAlign: 'right',
-    fontSize: 15,
+    fontSize: 20,
   },
 });
 
