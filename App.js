@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   lastUpdateLabel: {
-    fontSize: 10,
+    fontSize: 15,
     textAlign: 'left',
     color: 'gray',
   },
