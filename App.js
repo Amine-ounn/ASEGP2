@@ -6,6 +6,7 @@ import {StyleSheet, Platform, View, Text, Alert} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import {getUniqueId} from 'react-native-device-info';
+import moment from 'moment';
 
 const LATITUDE = 50.8677;
 const LONGITUDE = 50.8677;
@@ -18,14 +19,20 @@ const App = () => {
     longitude: LONGITUDE,
   });
 
+  const [lastUpdate, setLastUpdate] = useState(null);
+
   useEffect(() => {
-    handleLocationPermission();
+    try {
+      handleLocationPermission();
+      getCurrentLocation();
+      const watchId = trackUserLocation();
 
-    const watchId = trackUserLocation();
-
-    return () => {
-      Geolocation.clearWatch(watchId);
-    };
+      return () => {
+        Geolocation.clearWatch(watchId);
+      };
+    } catch (e) {
+      Alert.alert('Ooops', 'Something went wrong');
+    }
   });
 
   useEffect(() => {
@@ -41,13 +48,19 @@ const App = () => {
           lng: longitude,
           MAC: deviceId,
         })
-        .then(res => {})
+        .then(res => {
+          setLastUpdate(res.data.time);
+        })
         .catch(err => {
           console.log(err);
-          Alert.alert('Ooops', 'Something went while trying to save location', [
-            {text: 'Try again', onPress: () => sendLocation()},
-            {text: 'Cancel'},
-          ]);
+          Alert.alert(
+            'Ooops',
+            'Something went wrong while trying to save location',
+            [
+              {text: 'Try again', onPress: () => sendLocation()},
+              {text: 'Cancel'},
+            ],
+          );
         });
     };
 
@@ -102,6 +115,20 @@ const App = () => {
     return watchId;
   };
 
+  const getCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      position =>
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }),
+      error => {
+        Alert.alert(error.message);
+      },
+      {enableHighAccuracy: true, useSignificantChanges: true},
+    );
+  };
+
   return (
     <View style={styles.container}>
       <MapView
@@ -112,7 +139,8 @@ const App = () => {
           latitudeDelta: LATITUDE_DELTA,
           longitudeDelta: LONGITUDE_DELTA,
         }}
-        showsUserLocation={true}>
+        showsUserLocation={true}
+        showsMyLocationButton={true}>
         <Marker
           coordinate={location}
           title="You"
@@ -122,10 +150,18 @@ const App = () => {
 
       <View style={styles.modalContainer}>
         <View style={styles.modal}>
-          <Text style={styles.title}>Coordinates</Text>
-          <Text style={styles.coordinates}>
-            {location.latitude}, {location.longitude}
-          </Text>
+          <View>
+            <Text style={styles.title}>Coordinates</Text>
+            <Text style={styles.coordinates}>
+              {location.latitude}, {location.longitude}
+            </Text>
+          </View>
+          <View>
+            <Text style={styles.lastUpdateLabel}>Last Saved</Text>
+            <Text style={styles.lastUpdate}>
+              {moment(lastUpdate).format('h:mm:ss A')}
+            </Text>
+          </View>
         </View>
       </View>
     </View>
@@ -151,10 +187,14 @@ const styles = StyleSheet.create({
     minHeight: 0,
     backgroundColor: '#fff',
     zIndex: 1,
-    padding: 10,
+    padding: 20,
   },
   modal: {
     flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
   },
   title: {
     fontSize: 20,
@@ -163,6 +203,15 @@ const styles = StyleSheet.create({
   coordinates: {
     fontSize: 15,
     color: 'gray',
+  },
+  lastUpdateLabel: {
+    fontSize: 10,
+    textAlign: 'right',
+    color: 'gray',
+  },
+  lastUpdate: {
+    textAlign: 'right',
+    fontSize: 20,
   },
 });
 
