@@ -154,11 +154,11 @@ const App = () => {
             <Text style={styles.title}>Coordinates</Text>
             <Text style={styles.coordinates}>
               {location.latitude}, {location.longitude}
-            <Text style={styles.lastUpdateLabel}>Last Saved</Text>
+            
             </Text>
           </View>
           <View>
-            
+            <Text style={styles.lastUpdateLabel}>Last Saved</Text>
             <Text style={styles.lastUpdate}>
               {moment(lastUpdate).format('h:mm:ss A')}
             </Text>
