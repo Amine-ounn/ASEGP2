@@ -5,6 +5,8 @@ import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {StyleSheet, Platform, View, Text, Alert} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
+import {getUniqueId} from 'react-native-device-info';
+import moment from 'moment';
 
 const LATITUDE = 50.8677;
 const LONGITUDE = 50.8677;
@@ -17,98 +19,116 @@ const App = () => {
     longitude: LONGITUDE,
   });
 
+  const [lastUpdate, setLastUpdate] = useState(null);
+
   useEffect(() => {
-    const handleLocationPermission = async () => {
-      let checkIfGranted = '';
+    try {
+      handleLocationPermission();
+      getCurrentLocation();
+      const watchId = trackUserLocation();
 
-      // check if location permission is granted
-      // if not, request for permission
-
-      // iOS
-      if (Platform.OS === 'ios') {
-        checkIfGranted = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
-
-        if (
-          checkIfGranted === RESULTS.BLOCKED ||
-          checkIfGranted === RESULTS.DENIED
-        ) {
-          await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
-        } else {
-          getCurrentLocation();
-        }
-      }
-
-      // Android
-      if (Platform.OS === 'android') {
-        checkIfGranted = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
-
-        if (
-          checkIfGranted === RESULTS.BLOCKED ||
-          checkIfGranted === RESULTS.DENIED
-        ) {
-          await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
-        } else {
-          getCurrentLocation();
-        }
-      }
-    };
-
-    handleLocationPermission();
-    getCurrentLocation();
-    trackUserLocation();
+      return () => {
+        Geolocation.clearWatch(watchId);
+      };
+    } catch (e) {
+      Alert.alert('Ooops', 'Something went wrong');
+    }
   });
 
-  const getCurrentLocation = () => {
-    // will give you the current location
-    const id = Geolocation.getCurrentPosition(
-      position => {
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+  useEffect(() => {
+    const deviceId = getUniqueId();
+
+    // send location to server
+    const sendLocation = async () => {
+      const {latitude, longitude} = location;
+
+      axios
+        .post('https://ase2task3.herokuapp.com/api/create_locations/', {
+          lat: latitude,
+          lng: longitude,
+          MAC: deviceId,
+        })
+        .then(res => {
+          setLastUpdate(res.data.time);
+        })
+        .catch(err => {
+          console.log(err);
+          Alert.alert(
+            'Ooops',
+            'Something went wrong while trying to save location',
+            [
+              {text: 'Try again', onPress: () => sendLocation()},
+              {text: 'Cancel'},
+            ],
+          );
         });
- 
- // Send a POST request
-axios.post('https://ase2task3.herokuapp.com/api/create_locations/',{ 
-          lat: position.coords.latitude,
-          lng:  position.coords.longitude,
-          MAC: 'XD3254DQ',
-        },{
+    };
 
-"headers": {
+    sendLocation();
+  }, [location]);
 
-"content-type": "application/json",
+  const handleLocationPermission = async () => {
+    let checkIfGranted = '';
 
-},
+    // check if location permission is granted
+    // if not, request for permission
 
-}).then(res => {})
-.catch(err => {console.log(err);}); 
-      },
-      error => {
-        Alert.alert(error.message);
-      },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 5000},
-    );
+    // iOS
+    if (Platform.OS === 'ios') {
+      checkIfGranted = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
 
-    return id;
+      if (
+        checkIfGranted === RESULTS.BLOCKED ||
+        checkIfGranted === RESULTS.DENIED
+      ) {
+        await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+      }
+    }
+
+    // Android
+    if (Platform.OS === 'android') {
+      checkIfGranted = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+
+      if (
+        checkIfGranted === RESULTS.BLOCKED ||
+        checkIfGranted === RESULTS.DENIED
+      ) {
+        await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+      }
+    }
   };
 
   const trackUserLocation = () => {
     // will track the user location
-    Geolocation.watchPosition(
+    const watchId = Geolocation.watchPosition(
       position =>
         setLocation({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         }),
-      
       error => {
         Alert.alert(error.message);
       },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 5000},
+      {enableHighAccuracy: true, useSignificantChanges: true},
+    );
+
+    return watchId;
+  };
+
+  const getCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      position =>
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }),
+      error => {
+        Alert.alert(error.message);
+      },
+      {enableHighAccuracy: true, useSignificantChanges: true},
     );
   };
-  
- 
+
   return (
     <View style={styles.container}>
       <MapView
@@ -130,10 +150,18 @@ axios.post('https://ase2task3.herokuapp.com/api/create_locations/',{
 
       <View style={styles.modalContainer}>
         <View style={styles.modal}>
-          <Text style={styles.title}>Coordinates</Text>
-          <Text style={styles.coordinates}>
-            {location.latitude}, {location.longitude}
-          </Text>
+          <View>
+            <Text style={styles.title}>Coordinates</Text>
+            <Text style={styles.coordinates}>
+              {location.latitude}, {location.longitude}
+            </Text>
+          </View>
+          <View>
+            <Text style={styles.lastUpdateLabel}>Last Saved</Text>
+            <Text style={styles.lastUpdate}>
+              {moment(lastUpdate).format('h:mm:ss A')}
+            </Text>
+          </View>
         </View>
       </View>
     </View>
@@ -159,10 +187,14 @@ const styles = StyleSheet.create({
     minHeight: 0,
     backgroundColor: '#fff',
     zIndex: 1,
-    padding: 10,
+    padding: 20,
   },
   modal: {
     flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
   },
   title: {
     fontSize: 20,
@@ -171,6 +203,15 @@ const styles = StyleSheet.create({
   coordinates: {
     fontSize: 15,
     color: 'gray',
+  },
+  lastUpdateLabel: {
+    fontSize: 10,
+    textAlign: 'right',
+    color: 'gray',
+  },
+  lastUpdate: {
+    textAlign: 'right',
+    fontSize: 20,
   },
 });
 
