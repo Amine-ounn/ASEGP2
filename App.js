@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
     flex: 1,
     display: 'flex',
     flexDirection: 'row',
+    alignItems: 'center',
     width: '100%',
     justifyContent: 'space-between',
   },
