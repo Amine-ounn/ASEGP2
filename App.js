@@ -1,11 +1,11 @@
 import React from 'react';
-import {useEffect, useState} from 'react';
-import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
-import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
-import {StyleSheet, Platform, View, Text, Alert} from 'react-native';
+import { useEffect, useState } from 'react';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { StyleSheet, Platform, View, Text, Alert } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
-import {getUniqueId} from 'react-native-device-info';
+import { getUniqueId } from 'react-native-device-info';
 import moment from 'moment';
 
 const LATITUDE = 50.8677;
@@ -24,7 +24,8 @@ const App = () => {
   useEffect(() => {
     try {
       handleLocationPermission();
-      getCurrentLocation();
+      // getCurrentLocation();
+
       const watchId = trackUserLocation();
 
       return () => {
@@ -33,14 +34,14 @@ const App = () => {
     } catch (e) {
       Alert.alert('Ooops', 'Something went wrong');
     }
-  });
+  }, []);
 
   useEffect(() => {
     const deviceId = getUniqueId();
 
     // send location to server
     const sendLocation = async () => {
-      const {latitude, longitude} = location;
+      const { latitude, longitude } = location;
 
       axios
         .post('https://ase2task3.herokuapp.com/api/create_locations/', {
@@ -57,8 +58,8 @@ const App = () => {
             'Ooops',
             'Something went wrong while trying to save location',
             [
-              {text: 'Try again', onPress: () => sendLocation()},
-              {text: 'Cancel'},
+              { text: 'Try again', onPress: () => sendLocation() },
+              { text: 'Cancel' },
             ],
           );
         });
@@ -109,14 +110,14 @@ const App = () => {
       error => {
         Alert.alert(error.message);
       },
-      {enableHighAccuracy: true, useSignificantChanges: true},
+      { enableHighAccuracy: true, useSignificantChanges: true },
     );
 
     return watchId;
   };
 
   const getCurrentLocation = () => {
-    Geolocation.getCurrentPosition(
+    return Geolocation.getCurrentPosition(
       position =>
         setLocation({
           latitude: position.coords.latitude,
@@ -125,7 +126,7 @@ const App = () => {
       error => {
         Alert.alert(error.message);
       },
-      {enableHighAccuracy: true, useSignificantChanges: true},
+      { enableHighAccuracy: true, useSignificantChanges: true },
     );
   };
 
