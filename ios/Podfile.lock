@@ -372,6 +372,8 @@ PODS:
     - React-jsi (= 0.66.0)
     - React-logger (= 0.66.0)
     - React-perflogger (= 0.66.0)
+  - RNDeviceInfo (8.4.5):
+    - React-Core
   - RNPermissions (3.1.0):
     - React-Core
   - Yoga (1.14.0)
@@ -438,6 +440,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -531,6 +534,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNDeviceInfo:
+    :path: "../node_modules/react-native-device-info"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
   Yoga:
@@ -587,10 +592,11 @@ SPEC CHECKSUMS:
   React-RCTVibration: 53b92d54b923283638cb0186da7a5c2d2b70a49b
   React-runtimeexecutor: 4bb657a97aa74568d9ed634c8bd478299bb8a3a6
   ReactCommon: eb059748e842a1a86025ebbd4ac9d99e74492f88
+  RNDeviceInfo: ec64a28e7ddf30399f34c04708fdf702560d083a
   RNPermissions: 4b54095940aea8c03fa3e6c92d4ac3647b31ed4e
   Yoga: c11abbf5809216c91fcd62f5571078b83d9b6720
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 6f6d9006c1c0d1e5d8bb4002714f6b0c77b70eb4
+PODFILE CHECKSUM: f444670558b310c3c40e9f855964ad9f10ae59bd
 
 COCOAPODS: 1.11.2
