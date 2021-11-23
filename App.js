@@ -1,15 +1,15 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Marker, Heatmap } from 'react-native-maps';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { StyleSheet, Platform, View, Text, Alert } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import { getUniqueId } from 'react-native-device-info';
 import moment from 'moment';
-
+import points from './app/config/postal_districts';
 const LATITUDE = 50.8677;
-const LONGITUDE = 50.8677;
+const LONGITUDE = -0.0866;
 const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = 0.0121;
 
@@ -146,6 +146,17 @@ const App = () => {
           coordinate={location}
           title="You"
           description="This is your current location"
+        />
+        <Heatmap
+          points={points.data}
+          radius={50}
+          opacity={0.8}
+          
+          /*gradient={
+            colors=['blue','yellow','red'],
+            startPoints=[0.0,0.5,0.8],
+            colorMapSize = 256
+          }*/
         />
       </MapView>
 
