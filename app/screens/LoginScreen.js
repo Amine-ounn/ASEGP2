@@ -3,19 +3,86 @@
     version: 2021-11-20
 */
 
+import { returnStatement } from '@babel/types';
 import React from 'react';
-import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import Theme from '../config/Theme';
 
+
+  
 function LoginScreen(props) {
+    const validation = {
+        email: false,
+        password: false
+    }
+
+    const doLogin = () => {
+        // First do validation
+        var errorMsg = "";
+        if (validation.email === false) {
+            errorMsg += "\nInvalid Email Address";
+        }
+        if (validation.password === false) {
+            errorMsg += "\nPassword must contain at least 8 characters and contain upper and lower characters, digits and special characters."
+        }
+        if (errorMsg.length > 0) {
+            alert("ERRORS:" + errorMsg);
+            return;
+        } else {
+            // Do form submit
+        }
+    }
+    
+    const validateEmail = (text) => {
+        console.log(text);
+        let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (reg.test(text) === false) {
+            console.log("Email is Not Correct");
+            validation.email = false;
+            return false;
+        }
+        else {
+            console.log("Email is Correct");
+            validation.email = true;
+            return true;
+        }
+    }
+
+    const validatePassword = (pw) => {
+        /* Password must contain upper, lower, digit, special characters */
+        const reg = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z])(?=.*[a-z])[a-zA-Z0-9!@#$%^&*]{8,30}$/;
+        if (reg.test(pw) === false) {
+            console.log("Password is invalid");
+            validation.password = false;
+            return false;
+        }
+        else {
+            console.log("Password is valid");
+            validation.password = true;
+            return true;
+        }
+    }
+
     return (
             <KeyboardAvoidingView style={styles.container} behavior="padding">
                 <Image style={styles.logo } source={require("../assets/hot_props_logo.png") } />
                 <View style={styles.controlsContainer}>
-                    <TextInput style={styles.inputControl } placeholder="Email"></TextInput>
-                    <TextInput style={styles.inputControl} placeholder="Password" secureTextEntry></TextInput>
+                <TextInput
+                    style={styles.inputControl}
+                    placeholder="Email"
+                    onChangeText={validateEmail}
+                >
+                    
+                    </TextInput>
+                <TextInput
+                    style={styles.inputControl}
+                    placeholder="Password"
+                    secureTextEntry
+                    onChangeText={validatePassword}
+                >
+                </TextInput>
                     <View style={styles.btnContainer}>
-                        <TouchableOpacity onPress={() => { }} style={styles.btn}>
+                        <TouchableOpacity onPress={doLogin} style={styles.btn}>
                             <Text style={styles.btnText }>Log-in</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => { }} style={[styles.btn, styles.btnOutline]}>
