@@ -14,6 +14,11 @@ const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = 0.0121;
 
 const App = () => {
+  const heatmap_grad = {
+    'colors': ['lightblue','yellow', 'red'],
+    'startPoints': [0.03, 0.33, 0.66],
+    'colorMapSize': 256
+  };
   const [location, setLocation] = useState({
     latitude: LATITUDE,
     longitude: LONGITUDE,
@@ -151,12 +156,7 @@ const App = () => {
           points={points.data}
           radius={50}
           opacity={0.8}
-          
-          /*gradient={
-            colors=['blue','yellow','red'],
-            startPoints=[0.0,0.5,0.8],
-            colorMapSize = 256
-          }*/
+          gradient={heatmap_grad}
         />
       </MapView>
 
