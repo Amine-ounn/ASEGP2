@@ -7,7 +7,7 @@ import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import { getUniqueId } from 'react-native-device-info';
 import moment from 'moment';
-import points from './app/config/postal_districts';
+import points from './app/config/postal_sectors';
 const LATITUDE = 50.8677;
 const LONGITUDE = -0.0866;
 const LATITUDE_DELTA = 0.015;
