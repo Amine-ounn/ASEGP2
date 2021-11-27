@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Image } from 'react-native';
-import Theme from './config/Theme';
+import Theme from '../config/Theme';
 
 
 
@@ -50,7 +50,7 @@ export default function LoginScreen({ navigation }) {
                                     }
     return (
             <KeyboardAvoidingView style={styles.container} behavior="padding">
-                <Image style={styles.logo } source={require("./assets/hot_props_logo.png") } />
+                <Image style={styles.logo } source={require("../assets/hot_props_logo.png") } />
                 <View style={styles.controlsContainer}>
                 <TextInput
                     style={styles.inputControl}

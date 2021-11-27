@@ -1,17 +1,17 @@
 import { createStackNavigator } from "react-navigation-stack";
 import { createAppContainer } from 'react-navigation';
-import Register from '../Register';
-import LoginScreen from '../LoginScreen';
-import Map from '../Map';
+import Register from '../screens/Register';
+import LoginScreen from '../screens/LoginScreen';
+import Map from '../screens/Map';
 
 
 
 const screens = {
     
-    LoginScreen: {
+    Welcome: {
         screen: LoginScreen
     },
-    Register : {
+    Register: {
         screen: Register
     },
     Map: {
