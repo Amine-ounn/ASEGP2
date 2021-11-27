@@ -13,7 +13,7 @@ const LONGITUDE = 50.8677;
 const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = 0.0121;
 
-const App = () => {
+const Map = () => {
   const [location, setLocation] = useState({
     latitude: LATITUDE,
     longitude: LONGITUDE,
@@ -44,7 +44,7 @@ const App = () => {
       const { latitude, longitude } = location;
 
       axios
-        .post('https://ase2task3.herokuapp.com/api/create_locations/', {
+        .post('https://ase2task3.herokuMap.com/api/create_locations/', {
           lat: latitude,
           lng: longitude,
           MAC: deviceId,
@@ -216,4 +216,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default Map;

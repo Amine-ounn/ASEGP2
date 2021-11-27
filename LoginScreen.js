@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Image } from 'react-native';
-import Theme from '../config/Theme';
+import Theme from './config/Theme';
 
 function LoginScreen(props) {
     return (
             <KeyboardAvoidingView style={styles.container} behavior="padding">
-                <Image style={styles.logo } source={require("../assets/hot_props_logo.png") } />
+                <Image style={styles.logo } source={require("./assets/hot_props_logo.png") } />
                 <View style={styles.controlsContainer}>
                     <TextInput style={styles.inputControl } placeholder="Email"></TextInput>
                     <TextInput style={styles.inputControl} placeholder="Password" secureTextEntry></TextInput>
