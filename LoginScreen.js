@@ -2,7 +2,17 @@ import React from 'react';
 import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Image } from 'react-native';
 import Theme from './config/Theme';
 
-function LoginScreen(props) {
+
+
+export default function LoginScreen({ navigation }) {
+
+    const pressHandler = () => { 
+        navigation.navigate('Register'); 
+      
+                                  }
+        const pressHandler2 = () => { 
+        navigation.navigate('Map'); 
+                                    }
     return (
             <KeyboardAvoidingView style={styles.container} behavior="padding">
                 <Image style={styles.logo } source={require("./assets/hot_props_logo.png") } />
@@ -10,17 +20,18 @@ function LoginScreen(props) {
                     <TextInput style={styles.inputControl } placeholder="Email"></TextInput>
                     <TextInput style={styles.inputControl} placeholder="Password" secureTextEntry></TextInput>
                     <View style={styles.btnContainer}>
-                        <TouchableOpacity onPress={() => { }} style={styles.btn}>
+                        <TouchableOpacity onPress={pressHandler2} style={styles.btn}>
                             <Text style={styles.btnText }>Log-in</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => { }} style={[styles.btn, styles.btnOutline]}>
+                        <TouchableOpacity onPress={pressHandler} style={[styles.btn, styles.btnOutline]}>
                             <Text style={styles.btnTextOutline }>Register</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             </KeyboardAvoidingView>
     );
-}
+ }
+
 
 const styles = StyleSheet.create({
     btn: {
@@ -83,4 +94,3 @@ const styles = StyleSheet.create({
     }, 
 })
 
-export default LoginScreen;

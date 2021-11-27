@@ -8,11 +8,11 @@ import Map from '../Map';
 
 const screens = {
     
-    Register: {
-        screen: Register
-    },
     LoginScreen: {
         screen: LoginScreen
+    },
+    Register : {
+        screen: Register
     },
     Map: {
         screen: Map

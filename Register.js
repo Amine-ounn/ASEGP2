@@ -1,13 +1,16 @@
-import React, { Component } from 'react';
-import { Button, Keyboard, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
+import React from 'react';
+import { Button, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 
 
 
-export default function Register( props ) {
-const pressHandler = () => { 
-  navigation.navigate('LoginScreen'); 
+export default function Register({ navigation }) {
+ 
 
-                            }
+                            
+  const pressHandler = () => { 
+  navigation.navigate('Map'); 
+                            
+                             }
 return(
   
     
@@ -80,9 +83,6 @@ return(
             <Button title="Submit" onPress={pressHandler} />
           </View>
 
-          <View style={styles.btnContainer2}>
-            <Button title="Back to Login" onPress= {() => this.props.navigation.navigate('LoginScreen')} />
-          </View>
 
         </View>
       </View>
