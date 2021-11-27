@@ -1,12 +1,13 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Marker, Heatmap } from 'react-native-maps';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { StyleSheet, Platform, View, Text, Alert } from 'react-native'; 
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import { getUniqueId } from 'react-native-device-info';
 import moment from 'moment';
+import points from './config/postal_sectors';
 
 const LATITUDE = 50.8677;
 const LONGITUDE = 50.8677;
@@ -14,6 +15,11 @@ const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = 0.0121;
 
 const Map = () => {
+  const heatmap_grad = {
+    'colors': ['lightblue','yellow', 'red'],
+    'startPoints': [0.03, 0.33, 0.66],
+    'colorMapSize': 256
+  };
   const [location, setLocation] = useState({
     latitude: LATITUDE,
     longitude: LONGITUDE,
@@ -146,6 +152,12 @@ const Map = () => {
           coordinate={location}
           title="You"
           description="This is your current location"
+        />
+        <Heatmap
+          points={points.data}
+          radius={50}
+          opacity={0.8}
+          gradient={heatmap_grad}
         />
       </MapView>
 
