@@ -59,25 +59,36 @@ export default function LoginScreen({navigation}) {
   };
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
-      <Image
-        style={styles.logo}
-        source={require('../assets/hot_props_logo.png')}
-      />
-      <View style={styles.controlsContainer}>
-        <TextInput
-          style={styles.inputControl}
-          placeholder="Email"
-          onChangeText={validateEmail}
-        />
-        <TextInput
-          style={styles.inputControl}
-          placeholder="Password"
-          secureTextEntry
-          onChangeText={validatePassword}
-        />
+      <View style={styles.body}>
+        <View style={styles.form}>
+          <Image
+            style={styles.logo}
+            source={require('../assets/hot_props_logo.png')}
+          />
+
+          <View style={styles.controlsContainer}>
+            <TextInput
+              style={styles.inputControl}
+              placeholder="Email"
+              keyboardType="email-address"
+              onChangeText={validateEmail}
+            />
+            <TextInput
+              style={styles.inputControl}
+              placeholder="Password"
+              secureTextEntry
+              onChangeText={validatePassword}
+            />
+            <Text style={styles.leadingText}>
+              Login to continue to Hot Props. If you don't have an account,
+              please register.
+            </Text>
+          </View>
+        </View>
+
         <View style={styles.btnContainer}>
           <TouchableOpacity onPress={pressHandler2} style={styles.btn}>
-            <Text style={styles.btnText}>Log-in</Text>
+            <Text style={styles.btnText}>Log in</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={pressHandler}
@@ -91,35 +102,25 @@ export default function LoginScreen({navigation}) {
 }
 
 const styles = StyleSheet.create({
-  btn: {
+  body: {
+    width: '80%',
+    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: '20%',
+    marginBottom: '10%',
+  },
+  form: {
     width: '100%',
-    backgroundColor: Theme.primary,
-    marginTop: 12,
-    padding: 10,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  btnContainer: {
-    width: '75%',
-    marginTop: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
+  leadingText: {
+    marginTop: 10,
+    color: Theme.gray,
   },
-  btnOutline: {
-    backgroundColor: Theme.secondary,
-    borderColor: Theme.primary,
-    borderWidth: 2,
-  },
-  btnText: {
-    color: Theme.secondary,
-    fontWeight: '800',
-    fontSize: 20,
-  },
-  btnTextOutline: {
-    color: Theme.primary,
-    fontWeight: '800',
-    fontSize: 20,
+  logo: {
+    width: '40%',
+    height: undefined,
+    aspectRatio: 1,
   },
   container: {
     backgroundColor: Theme.background,
@@ -129,24 +130,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   controlsContainer: {
-    width: '80%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: '100%',
   },
   inputControl: {
     width: '100%',
     backgroundColor: Theme.secondary,
-    padding: 10,
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: 10,
+    paddingRight: 10,
     marginTop: 15,
-    borderRadius: 10,
-    fontWeight: '500',
-    fontSize: 18,
+    borderRadius: 8,
   },
-  logo: {
-    width: '60%',
-    height: undefined,
-    aspectRatio: 1,
-    justifyContent: 'flex-start',
-    marginTop: 40,
+  btn: {
+    width: '100%',
+    backgroundColor: Theme.primary,
+    marginTop: 12,
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  btnContainer: {
+    width: '100%',
+    marginTop: 'auto',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  btnOutline: {
+    backgroundColor: Theme.gray,
+    borderColor: Theme.primary,
+  },
+  btnText: {
+    color: Theme.secondary,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  btnTextOutline: {
+    color: Theme.background,
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
