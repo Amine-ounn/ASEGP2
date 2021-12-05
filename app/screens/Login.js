@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -12,12 +12,11 @@ import {validate} from '../config/validation';
 import Button from '../components/Button';
 
 export default function LoginScreen({navigation}) {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [emailError, setEmailError] = React.useState(true); // true means error
-  const [passwordError, setPasswordError] = React.useState(true); // set as default to disable login on load
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isDisabled, setIsDisabled] = React.useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const onEmailChange = value => {
     setEmail(value);
@@ -26,22 +25,25 @@ export default function LoginScreen({navigation}) {
 
   const onPasswordChange = value => {
     setPassword(value);
-    setPasswordError(validate(value, 'password'));
   };
 
   const onRegister = () => {
     navigation.navigate('Register');
   };
 
-  const onLogin = () => {
-    if (!(emailError && passwordError)) {
+  const handleLogin = () => {
+    if (!emailError) {
       setIsLoading(true);
       setIsDisabled(true);
 
-      // handle authentication
+      // TODO: handle authentication
       navigation.navigate('Map');
     }
   };
+
+  useEffect(() => {
+    setIsDisabled(emailError || !email.length || !password.length);
+  }, [emailError, email, password]);
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
@@ -76,11 +78,11 @@ export default function LoginScreen({navigation}) {
 
         <View style={styles.btnContainer}>
           <Button
-            onClick={onLogin}
+            onClick={handleLogin}
             disabled={isDisabled}
             loading={isLoading}
             primary={true}>
-            Log in
+            Log in.
           </Button>
           <Button onClick={onRegister}>Register</Button>
         </View>
