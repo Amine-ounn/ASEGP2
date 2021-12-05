@@ -93,7 +93,7 @@ export default function LoginScreen({navigation}) {
 
 const styles = StyleSheet.create({
   body: {
-    width: '80%',
+    width: '90%',
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
