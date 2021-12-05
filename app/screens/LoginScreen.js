@@ -5,58 +5,44 @@ import {
   Text,
   KeyboardAvoidingView,
   TextInput,
-  TouchableOpacity,
   Image,
-  Alert,
 } from 'react-native';
 import Theme from '../config/Theme';
+import {validate} from '../config/validation';
+import Button from '../components/Button';
 
 export default function LoginScreen({navigation}) {
-  const validation = {
-    email: false,
-    password: false,
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [emailError, setEmailError] = React.useState(true); // true means error
+  const [passwordError, setPasswordError] = React.useState(true); // set as default to disable login on load
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isDisabled, setIsDisabled] = React.useState(true);
+
+  const onEmailChange = value => {
+    setEmail(value);
+    setEmailError(validate(value, 'email'));
   };
 
-  const checkLogin = () => {
-    // First do validation
-    var errorMsg = '';
-    if (validation.email === false) {
-      errorMsg += '\nInvalid Email Address';
-    }
-    if (validation.password === false) {
-      errorMsg +=
-        '\nPassword must contain at least 8 characters and contain upper and lower characters, digits and special characters.';
-    }
-    if (errorMsg.length > 0) {
-      Alert.alert('Oops', 'ERRORS:' + errorMsg);
-
-      return false;
-    }
-    return true;
+  const onPasswordChange = value => {
+    setPassword(value);
+    setPasswordError(validate(value, 'password'));
   };
 
-  const validateEmail = text => {
-    /* Does entered text conform to a valid email address? */
-    let reg = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    reg.test(text) ? (validation.email = true) : (validation.email = false);
-  };
-
-  const validatePassword = pw => {
-    /* Password must contain upper, lower, digit, special characters */
-    const reg =
-      /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z])(?=.*[a-z])[a-zA-Z0-9!@#$%^&*]{8,30}$/;
-    reg.test(pw) ? (validation.password = true) : (validation.password = false);
-  };
-
-  const pressHandler = () => {
+  const onRegister = () => {
     navigation.navigate('Register');
   };
-  const pressHandler2 = () => {
-    /* Validate form and then despatch */
-    if (checkLogin()) {
+
+  const onLogin = () => {
+    if (!(emailError && passwordError)) {
+      setIsLoading(true);
+      setIsDisabled(true);
+
+      // handle authentication
       navigation.navigate('Map');
     }
   };
+
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.body}>
@@ -69,15 +55,17 @@ export default function LoginScreen({navigation}) {
           <View style={styles.controlsContainer}>
             <TextInput
               style={styles.inputControl}
+              value={email}
               placeholder="Email"
               keyboardType="email-address"
-              onChangeText={validateEmail}
+              onChangeText={onEmailChange}
             />
             <TextInput
               style={styles.inputControl}
+              value={password}
               placeholder="Password"
               secureTextEntry
-              onChangeText={validatePassword}
+              onChangeText={onPasswordChange}
             />
             <Text style={styles.leadingText}>
               Login to continue to Hot Props. If you don't have an account,
@@ -87,14 +75,14 @@ export default function LoginScreen({navigation}) {
         </View>
 
         <View style={styles.btnContainer}>
-          <TouchableOpacity onPress={pressHandler2} style={styles.btn}>
-            <Text style={styles.btnText}>Log in</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={pressHandler}
-            style={[styles.btn, styles.btnOutline]}>
-            <Text style={styles.btnTextOutline}>Register</Text>
-          </TouchableOpacity>
+          <Button
+            onClick={onLogin}
+            disabled={isDisabled}
+            loading={isLoading}
+            primary={true}>
+            Log in
+          </Button>
+          <Button onClick={onRegister}>Register</Button>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -142,36 +130,10 @@ const styles = StyleSheet.create({
     marginTop: 15,
     borderRadius: 8,
   },
-  btn: {
-    width: '100%',
-    backgroundColor: Theme.primary,
-    marginTop: 12,
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingLeft: 10,
-    paddingRight: 10,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   btnContainer: {
     width: '100%',
     marginTop: 'auto',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  btnOutline: {
-    backgroundColor: Theme.gray,
-    borderColor: Theme.primary,
-  },
-  btnText: {
-    color: Theme.secondary,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  btnTextOutline: {
-    color: Theme.background,
-    fontWeight: 'bold',
-    fontSize: 16,
   },
 });
