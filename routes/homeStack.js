@@ -2,7 +2,7 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import Register from '../app/screens/Register';
-import LoginScreen from '../app/screens/LoginScreen';
+import Login from '../app/screens/Login';
 import Map from '../app/screens/Map';
 
 const HomeStack = createNativeStackNavigator();
@@ -13,7 +13,7 @@ const HomeStackNavigator = () => {
       <HomeStack.Navigator initialRouteName="Welcome">
         <HomeStack.Screen
           name="Welcome"
-          component={LoginScreen}
+          component={Login}
           options={{headerShown: false}}
         />
         <HomeStack.Screen
