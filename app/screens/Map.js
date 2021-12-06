@@ -8,8 +8,8 @@ import axios from 'axios';
 import {getUniqueId} from 'react-native-device-info';
 import points from '../config/postal_sectors';
 import Theme from '../config/Theme';
-const LATITUDE = 50.8677;
-const LONGITUDE = -0.0866;
+const LATITUDE = 55.3781;
+const LONGITUDE = 3.436;
 const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = 0.0121;
 const WEATHER_UPDATE = 1000 * 60 * 5; // 5 minutes
@@ -123,7 +123,7 @@ const App = () => {
         });
     };
 
-    sendLocation();
+    // sendLocation();
   }, [location]);
 
   const handleLocationPermission = async () => {
@@ -172,20 +172,6 @@ const App = () => {
     );
 
     return watchId;
-  };
-
-  const getCurrentLocation = () => {
-    return Geolocation.getCurrentPosition(
-      position =>
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        }),
-      error => {
-        Alert.alert(error.message);
-      },
-      {enableHighAccuracy: true, useSignificantChanges: true},
-    );
   };
 
   return (

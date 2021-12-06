@@ -6,4 +6,5 @@ export default {
   gray: '#ccc',
   lightGray: '#eee',
   textDisabled: '#aaa',
+  error: '#FF9494',
 };

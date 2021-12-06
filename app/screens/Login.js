@@ -6,18 +6,21 @@ import {
   KeyboardAvoidingView,
   TextInput,
   Image,
+  Alert,
 } from 'react-native';
 import Theme from '../config/Theme';
 import {validate} from '../config/validation';
 import Button from '../components/Button';
 import ButtonLink from '../components/ButtonLink';
+import useAuth from '../hooks/useAuth';
 
 export default function LoginScreen({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
+
+  const {login, isLoading} = useAuth();
 
   const onEmailChange = value => {
     setEmail(value);
@@ -28,13 +31,15 @@ export default function LoginScreen({navigation}) {
     setPassword(value);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!emailError) {
-      setIsLoading(true);
-      setIsDisabled(true);
+      const loggedIn = await login({email, password});
 
-      // TODO: handle authentication
-      navigation.navigate('Map');
+      if (loggedIn) {
+        navigation.navigate('Map');
+      } else {
+        Alert.alert('Login failed', 'Please check your credentials');
+      }
     }
   };
 
@@ -59,6 +64,8 @@ export default function LoginScreen({navigation}) {
               keyboardType="email-address"
               onChangeText={onEmailChange}
             />
+            {!!emailError && <Text style={styles.errorText}>{emailError}</Text>}
+
             <TextInput
               style={styles.inputControl}
               value={password}
@@ -148,5 +155,9 @@ const styles = StyleSheet.create({
   registerText: {
     textAlign: 'left',
     color: Theme.white,
+  },
+  errorText: {
+    color: Theme.error,
+    marginTop: 10,
   },
 });

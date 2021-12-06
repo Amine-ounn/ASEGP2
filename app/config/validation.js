@@ -27,3 +27,5 @@ export function validate(text, type, required) {
   }
   return null;
 }
+
+export default validate;

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -6,11 +6,13 @@ import {
   TextInput,
   Image,
   Text,
+  Alert,
 } from 'react-native';
 import Theme from '../config/Theme';
 import Button from '../components/Button';
 import validate from '../config/validation';
 import ButtonLink from '../components/ButtonLink';
+import useAuth from '../hooks/useAuth';
 
 export default function Register({navigation}) {
   const [name, setName] = useState('');
@@ -18,20 +20,8 @@ export default function Register({navigation}) {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [isDisabled, setIsDisabled] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleRegister = () => {
-    if (!isDisabled) {
-      setIsLoading(true);
-      // TODO: Register user
-
-      // TODO: Handle error
-
-      setIsLoading(false);
-      setEmailError('Email is required');
-    }
-  };
+  const {register, isLoading, error} = useAuth();
 
   const onNameChange = value => {
     setName(value);
@@ -47,11 +37,22 @@ export default function Register({navigation}) {
     setPasswordError(validate(value, 'password', true));
   };
 
-  useEffect(() => {
-    setIsDisabled(
-      emailError || passwordError || !email.length || !password.length,
-    );
-  }, [emailError, passwordError, email, password]);
+  const handleRegister = async () => {
+    const userRegistered = await register({name, email, password});
+
+    if (userRegistered) {
+      navigation.navigate('Login');
+    } else {
+      Alert.alert(
+        'Ooops',
+        `${
+          error?.email
+            ? error.email.toString()
+            : 'Something went wrong, please try again'
+        }`,
+      );
+    }
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
@@ -75,6 +76,7 @@ export default function Register({navigation}) {
               placeholder="Email"
               onChangeText={onEmailChange}
             />
+            {!!emailError && <Text style={styles.errorText}>{emailError}</Text>}
             <TextInput
               style={styles.inputControl}
               value={password}
@@ -82,13 +84,19 @@ export default function Register({navigation}) {
               secureTextEntry
               onChangeText={onPasswordChange}
             />
+            {!!passwordError && (
+              <Text style={styles.errorText}>{passwordError}</Text>
+            )}
           </View>
         </View>
 
         <View style={styles.btnContainer}>
           <Button
             onClick={handleRegister}
-            disabled={isDisabled}
+            disabled={
+              emailError || passwordError || !email.length || !password.length
+            }
+            primary
             loading={isLoading}>
             Register
           </Button>
@@ -153,5 +161,9 @@ const styles = StyleSheet.create({
   loginText: {
     textAlign: 'left',
     color: Theme.white,
+  },
+  errorText: {
+    color: Theme.error,
+    marginTop: 10,
   },
 });
