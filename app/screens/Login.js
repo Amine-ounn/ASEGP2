@@ -10,6 +10,7 @@ import {
 import Theme from '../config/Theme';
 import {validate} from '../config/validation';
 import Button from '../components/Button';
+import ButtonLink from '../components/ButtonLink';
 
 export default function LoginScreen({navigation}) {
   const [email, setEmail] = useState('');
@@ -25,10 +26,6 @@ export default function LoginScreen({navigation}) {
 
   const onPasswordChange = value => {
     setPassword(value);
-  };
-
-  const onRegister = () => {
-    navigation.navigate('Register');
   };
 
   const handleLogin = () => {
@@ -84,7 +81,13 @@ export default function LoginScreen({navigation}) {
             primary={true}>
             Log in.
           </Button>
-          <Button onClick={onRegister}>Register</Button>
+          <View style={styles.btnLinkText}>
+            <Text style={styles.registerText}>Don't have an account? </Text>
+            <ButtonLink onClick={() => navigation.navigate('Register')}>
+              Register
+            </ButtonLink>
+          </View>
+          {/* <Button onClick={onRegister}>Register</Button> */}
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -135,7 +138,15 @@ const styles = StyleSheet.create({
   btnContainer: {
     width: '100%',
     marginTop: 'auto',
-    justifyContent: 'center',
-    alignItems: 'center',
+  },
+  btnLinkText: {
+    marginTop: 10,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  registerText: {
+    textAlign: 'left',
+    color: Theme.white,
   },
 });
