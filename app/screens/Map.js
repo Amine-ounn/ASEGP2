@@ -31,7 +31,7 @@ const App = () => {
     region: '',
     temp_c: 0,
     temp_f: 0,
-    icon: '',
+    icon: null,
     cloud: 0,
     wind_mph: 0,
     wind_kph: 0,
@@ -43,7 +43,6 @@ const App = () => {
     return fetch(weather_url)
       .then(response => response.json())
       .then(data => {
-        //console.log(data);
         setWeather({
           name: data.location.name,
           region: data.location.region,
@@ -60,26 +59,6 @@ const App = () => {
         console.error(err);
       });
   };
-
-  // Update weather intermittently
-  useEffect(() => {
-    let weather_url =
-      'https://api.weatherapi.com/v1/current.json?key=9bb972c1338243fea82161415213011&q=' +
-      location.latitude +
-      ',' +
-      location.longitude +
-      '&aqi=no';
-    getWeatherData(weather_url);
-    setInterval(() => {
-      weather_url =
-        'https://api.weatherapi.com/v1/current.json?key=9bb972c1338243fea82161415213011&q=' +
-        location.latitude +
-        ',' +
-        location.longitude +
-        '&aqi=no';
-      getWeatherData(weather_url);
-    }, WEATHER_UPDATE);
-  }, [location]);
 
   useEffect(() => {
     try {
@@ -124,6 +103,21 @@ const App = () => {
     };
 
     // sendLocation();
+
+    // Get Weather and update intermittently every 5 minutes
+    const weather_url = `https://api.weatherapi.com/v1/current.json?key=9bb972c1338243fea82161415213011&q=${location.latitude},${location.longitude}&aqi=no`;
+
+    getWeatherData(weather_url);
+
+    setInterval(() => {
+      weather_url =
+        'https://api.weatherapi.com/v1/current.json?key=9bb972c1338243fea82161415213011&q=' +
+        location.latitude +
+        ',' +
+        location.longitude +
+        '&aqi=no';
+      getWeatherData(weather_url);
+    }, WEATHER_UPDATE);
   }, [location]);
 
   const handleLocationPermission = async () => {
@@ -206,12 +200,13 @@ const App = () => {
             <Text style={styles.weatherTxt}> {weatherData.cloud}%</Text>
           </View>
           <View style={styles.place}>
-            <Text style={styles.weatherTxt}>{weatherData.name}</Text>
+            <Text style={[styles.weatherTxt, styles.currentLocation]}>
+              {weatherData.name}
+            </Text>
           </View>
           <View style={styles.temp}>
             <Text style={styles.weatherTxt}>
-              {' '}
-              {weatherData.temp_c}C/{weatherData.temp_f}F
+              {weatherData.temp_c}˚C / {weatherData.temp_f}F
             </Text>
           </View>
         </View>
@@ -229,18 +224,20 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-    height: '94%',
+    height: '90%',
   },
 
   modalContainer: {
     flex: 1,
     position: 'absolute',
-    height: '6%',
+    height: '10%',
     width: '100%',
     minHeight: 44,
-    backgroundColor: Theme.background,
     zIndex: 1,
     padding: 5,
+    paddingLeft: 20,
+    paddingRight: 20,
+    backgroundColor: Theme.background,
   },
   modal: {
     flex: 1,
@@ -279,6 +276,9 @@ const styles = StyleSheet.create({
   weatherTxt: {
     fontSize: 15,
     color: Theme.secondary,
+  },
+  currentLocation: {
+    fontSize: 20,
   },
   lastUpdateLabel: {
     textAlign: 'left',
