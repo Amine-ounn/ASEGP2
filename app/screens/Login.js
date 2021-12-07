@@ -86,7 +86,7 @@ export default function LoginScreen({navigation}) {
             disabled={isDisabled}
             loading={isLoading}
             primary={true}>
-            Log in.
+            Login
           </Button>
           <View style={styles.btnLinkText}>
             <Text style={styles.registerText}>Don't have an account? </Text>
