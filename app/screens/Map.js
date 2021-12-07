@@ -110,12 +110,6 @@ const App = () => {
     getWeatherData(weather_url);
 
     setInterval(() => {
-      weather_url =
-        'https://api.weatherapi.com/v1/current.json?key=9bb972c1338243fea82161415213011&q=' +
-        location.latitude +
-        ',' +
-        location.longitude +
-        '&aqi=no';
       getWeatherData(weather_url);
     }, WEATHER_UPDATE);
   }, [location]);
@@ -194,15 +188,16 @@ const App = () => {
       </MapView>
 
       <View style={styles.modalContainer}>
-        <View style={styles.modal}>
+        <View style={styles.place}>
+          <Text style={styles.sectionTitle}>Current Location</Text>
+          <Text style={[styles.weatherTxt, styles.currentLocation]}>
+            {weatherData.name}
+          </Text>
+        </View>
+        <View style={styles.weather}>
           <View style={styles.cloud}>
             <Image style={styles.icon} source={{uri: weatherData.icon}} />
             <Text style={styles.weatherTxt}> {weatherData.cloud}%</Text>
-          </View>
-          <View style={styles.place}>
-            <Text style={[styles.weatherTxt, styles.currentLocation]}>
-              {weatherData.name}
-            </Text>
           </View>
           <View style={styles.temp}>
             <Text style={styles.weatherTxt}>
@@ -224,14 +219,14 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-    height: '90%',
+    height: '85%',
   },
-
   modalContainer: {
     flex: 1,
     position: 'absolute',
-    height: '10%',
+    height: '15%',
     width: '100%',
+    justifyContent: 'space-around',
     minHeight: 44,
     zIndex: 1,
     padding: 5,
@@ -239,7 +234,7 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     backgroundColor: Theme.background,
   },
-  modal: {
+  weather: {
     flex: 1,
     display: 'flex',
     flexDirection: 'row',
@@ -247,6 +242,7 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-between',
     alignContent: 'center',
+    marginBottom: 10,
   },
   cloud: {
     flex: 1,
@@ -256,11 +252,11 @@ const styles = StyleSheet.create({
     width: '15%',
   },
   place: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '70%',
+    marginTop: 10,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    color: Theme.gray,
   },
   temp: {
     flex: 1,
