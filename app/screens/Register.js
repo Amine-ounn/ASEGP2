@@ -5,7 +5,6 @@ import {
   KeyboardAvoidingView,
   TextInput,
   Text,
-  Alert,
 } from 'react-native';
 import Theme from '../config/Theme';
 import Button from '../components/Button';
@@ -20,7 +19,7 @@ export default function Register({navigation}) {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
-  const {register, isLoading, error} = useAuth();
+  const {register, isLoading} = useAuth();
 
   const onNameChange = value => {
     setName(value);
@@ -37,20 +36,7 @@ export default function Register({navigation}) {
   };
 
   const handleRegister = async () => {
-    const userRegistered = await register({name, email, password});
-
-    if (userRegistered) {
-      navigation.navigate('Login');
-    } else {
-      Alert.alert(
-        'Ooops',
-        `${
-          error?.email
-            ? error.email.toString()
-            : 'Something went wrong, please try again'
-        }`,
-      );
-    }
+    await register({name, email, password});
   };
 
   return (
@@ -160,7 +146,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
     marginTop: 20,
-    borderRadius: 8,
+    borderRadius: 5,
   },
   btnLinkText: {
     marginTop: 15,

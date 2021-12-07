@@ -2,13 +2,13 @@ import React, {useEffect, useState} from 'react';
 import AuthContext from '../contexts/AuthContext';
 import api, {setAuthToken} from '../config/axiosConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Alert} from 'react-native';
 
 export const AuthProvider = ({children}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [splashScreen, setSplashScreen] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     setSplashScreen(true);
@@ -47,12 +47,14 @@ export const AuthProvider = ({children}) => {
         setIsLoading(false);
       })
       .catch(err => {
+        Alert.alert('Login failed', 'Please check your credentials');
         setIsLoading(false);
         console.log(err);
       });
   };
 
   const onLogout = () => {
+    AsyncStorage.removeItem('@token');
     setIsAuthenticated(false);
     setAuthToken(null);
     setUser(null);
@@ -62,17 +64,22 @@ export const AuthProvider = ({children}) => {
     setIsLoading(true);
 
     return await api
-      .post('register/', JSON.stringify({name, email, password}))
-      .then(response => {
-        if (response.status === 200) {
-          return true;
-        }
+      .post('register/', {name, email, password})
+      .then(async response => {
         setIsLoading(false);
+
+        // login user
+        if (response.status === 201) {
+          await onLogin({email, password});
+        }
       })
       .catch(err => {
+        console.log(err.response);
         setIsLoading(false);
-        console.log(err);
-        return false;
+        Alert.alert(
+          'Sorry',
+          `We could not register you, please check your credentials and try again. ${err.response.data?.email.toString()}`,
+        );
       });
   };
 
@@ -82,7 +89,6 @@ export const AuthProvider = ({children}) => {
         isAuthenticated,
         user,
         isLoading,
-        error,
         splashScreen,
         login: onLogin,
         logout: onLogout,
