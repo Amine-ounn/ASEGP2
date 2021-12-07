@@ -4,7 +4,6 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   TextInput,
-  Image,
   Text,
   Alert,
 } from 'react-native';
@@ -58,10 +57,13 @@ export default function Register({navigation}) {
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.body}>
         <View style={styles.form}>
-          <Image
-            style={styles.logo}
-            source={require('../assets/hot_props_logo.png')}
-          />
+          <Text style={styles.heroText}>
+            Get prices and weather across England and Wales
+          </Text>
+          <Text style={styles.leadingText}>
+            It's as easy as zooming and tapping, the rest is taken care of.
+            Takes less than a minute to register.
+          </Text>
 
           <View style={styles.controlsContainer}>
             <TextInput
@@ -124,10 +126,18 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
   },
-  logo: {
-    width: '40%',
-    height: undefined,
-    aspectRatio: 1,
+  heroText: {
+    fontSize: 30,
+    fontWeight: '500',
+    color: Theme.white,
+    marginTop: '10%',
+  },
+  leadingText: {
+    marginTop: 15,
+    marginBottom: 35,
+    fontSize: 14,
+    width: '95%',
+    color: Theme.gray,
   },
   btnContainer: {
     width: '100%',
@@ -153,7 +163,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   btnLinkText: {
-    marginTop: 10,
+    marginTop: 15,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'baseline',

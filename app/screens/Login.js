@@ -5,8 +5,6 @@ import {
   Text,
   KeyboardAvoidingView,
   TextInput,
-  Image,
-  Alert,
 } from 'react-native';
 import Theme from '../config/Theme';
 import {validate} from '../config/validation';
@@ -33,13 +31,7 @@ export default function LoginScreen({navigation}) {
 
   const handleLogin = async () => {
     if (!emailError) {
-      const loggedIn = await login({email, password});
-
-      if (loggedIn) {
-        navigation.navigate('Map');
-      } else {
-        Alert.alert('Login failed', 'Please check your credentials');
-      }
+      await login({email, password});
     }
   };
 
@@ -51,10 +43,11 @@ export default function LoginScreen({navigation}) {
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.body}>
         <View style={styles.form}>
-          <Image
-            style={styles.logo}
-            source={require('../assets/hot_props_logo.png')}
-          />
+          <Text style={styles.heroText}>Welcome Back!</Text>
+          <Text style={styles.leadingText}>
+            Login to continue to Hot Props. If you don't have an account, please
+            register.
+          </Text>
 
           <View style={styles.controlsContainer}>
             <TextInput
@@ -73,10 +66,6 @@ export default function LoginScreen({navigation}) {
               secureTextEntry
               onChangeText={onPasswordChange}
             />
-            <Text style={styles.leadingText}>
-              Login to continue to Hot Props. If you don't have an account,
-              please register.
-            </Text>
           </View>
         </View>
 
@@ -113,8 +102,17 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
   },
+  heroText: {
+    fontSize: 30,
+    fontWeight: '500',
+    color: Theme.white,
+    marginTop: '10%',
+  },
   leadingText: {
-    marginTop: 10,
+    marginTop: 15,
+    marginBottom: 35,
+    fontSize: 14,
+    width: '95%',
     color: Theme.gray,
   },
   logo: {
@@ -140,14 +138,14 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
     marginTop: 15,
-    borderRadius: 8,
+    borderRadius: 5,
   },
   btnContainer: {
     width: '100%',
     marginTop: 'auto',
   },
   btnLinkText: {
-    marginTop: 10,
+    marginTop: 15,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'baseline',
