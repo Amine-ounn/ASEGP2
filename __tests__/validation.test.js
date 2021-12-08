@@ -54,7 +54,7 @@ const invalidPasswords = [
     'AAAAAFFFG!a',
     '$£%!$&*ghj2',
     'vbebfebw23$j2',
-    'aaaaaa57ABC',
+    'aaaaaa57c',
     'aastrGWEGW',
     '3756!$%778'
 ];
