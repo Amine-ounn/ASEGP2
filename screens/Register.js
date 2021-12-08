@@ -7,7 +7,6 @@ import Theme from '../config/Theme';
 export default function Register({ navigation }) {
  
   const validation = {
-    
     email: false,
     password: false
 }
@@ -15,10 +14,10 @@ const checkRegistration = () => {
   // First do validation
   var errorMsg = "";
   if (validation.email === false) {
-      errorMsg += "\nInvalid Email Address";
+      errorMsg += "\n-Invalid Email Address";
   }
   if (validation.password === false) {
-      errorMsg += "\nPassword must contain at least 8 characters and contain upper and lower characters, digits and special characters."
+      errorMsg += "\n-Password must contain at least 8 characters and contain upper and lower characters, digits and special characters."
   }
   if (errorMsg.length > 0) {
       alert("ERRORS:" + errorMsg);
@@ -39,12 +38,15 @@ const validatePassword = (pw) => {
   const reg = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z])(?=.*[a-z])[a-zA-Z0-9!@#$%^&*]{8,30}$/;
   reg.test(pw) ? validation.password = true : validation.password = false;
 }
-                            
+
+
   
                         
         const pressHandler = () => {
           /* Validate form and then despatch */
          if (checkRegistration()) {
+           this.email= '';
+           this.password= '';
         navigation.navigate('Map');
                                   }
                                     }
