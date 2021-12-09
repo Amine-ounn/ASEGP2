@@ -43,7 +43,7 @@ export default function LoginScreen({navigation}) {
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.body}>
         <View style={styles.form}>
-          <Text style={styles.heroText}>Welcome Back!</Text>
+          <Text  testID="welcome" style={styles.heroText}>Welcome Back!</Text>
           <Text style={styles.leadingText}>
             Login to continue to Hot Props. If you don't have an account, please
             register.

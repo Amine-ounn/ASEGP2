@@ -8,6 +8,7 @@ export const SplashScreen = ({navigation}) => {
       <Image
         style={styles.logo}
         source={require('../assets/hot_props_logo.png')}
+        testID="logo"
       />
     </View>
   );
