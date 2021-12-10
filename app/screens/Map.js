@@ -11,7 +11,7 @@ import {StyleSheet, Platform, View, Text, Alert, Image} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import points from '../config/postal_sectors';
 import Theme from '../config/Theme';
-import {getProperties} from '../api/properties';
+import {getProperties, saveProperty} from '../api/properties';
 import axios from 'axios';
 
 const LATITUDE = 51.503244;
@@ -67,13 +67,6 @@ const App = () => {
       .catch(err => {
         console.error(err);
       });
-  };
-
-  // Fetch properties
-  const fetchProperties = async () => {
-    return getProperties(location).then(properties =>
-      setPropertyMarkers(properties),
-    );
   };
 
   useEffect(() => {
@@ -133,6 +126,16 @@ const App = () => {
       ) {
         await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
       }
+    }
+  };
+
+  const handleSaveProperty = async (latitude, longitude) => {
+    const response = await saveProperty({latitude, longitude});
+
+    if (response.status === 200) {
+      Alert.alert('Success', 'Property saved successfully');
+    } else {
+      Alert.alert('Ooops', 'Something went wrong, please try again later');
     }
   };
 
@@ -198,9 +201,9 @@ const App = () => {
               }}>
               <Callout
                 onPress={() => {
-                  Alert.alert(
-                    'Property Details',
-                    `${property._source.name} \n ${property._source.address}`,
+                  handleSaveProperty(
+                    property._source.latitude,
+                    property._source.longitude,
                   );
                 }}>
                 <View style={styles.callout}>
@@ -208,6 +211,7 @@ const App = () => {
                   <Text style={styles.calloutText}>
                     {formatPrice(property._source.avg_price)} GBP
                   </Text>
+                  <Text style={styles.tapToSave}>Tap to save property</Text>
                 </View>
               </Callout>
             </Marker>
@@ -315,6 +319,11 @@ const styles = StyleSheet.create({
   calloutText: {
     fontWeight: '500',
     marginBottom: 5,
+    fontSize: 20,
+  },
+  tapToSave: {
+    fontSize: 10,
+    marginVertical: 5,
   },
   currentLocation: {
     fontSize: 20,
