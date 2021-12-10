@@ -1,6 +1,6 @@
 import React from 'react';
 import {useEffect, useState} from 'react';
-import MapView, {PROVIDER_GOOGLE, Heatmap} from 'react-native-maps';
+import MapView, {PROVIDER_GOOGLE, Heatmap, Marker} from 'react-native-maps';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {StyleSheet, Platform, View, Text, Alert, Image} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
@@ -8,8 +8,10 @@ import axios from 'axios';
 import {getUniqueId} from 'react-native-device-info';
 import points from '../config/postal_sectors';
 import Theme from '../config/Theme';
-const LATITUDE = 55.3781;
-const LONGITUDE = 3.436;
+import {getProperties} from '../api/properties';
+
+const LATITUDE = 51.503244;
+const LONGITUDE = -0.129778;
 const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = 0.0121;
 const WEATHER_UPDATE = 1000 * 60 * 5; // 5 minutes
@@ -17,13 +19,16 @@ const WEATHER_UPDATE = 1000 * 60 * 5; // 5 minutes
 const App = () => {
   const heatmap_grad = {
     colors: ['lightblue', 'yellow', 'red'],
-    startPoints: [0.03, 0.33, 0.66],
+    startPoints: [0.005, 0.33, 0.66],
     colorMapSize: 256,
   };
+
   const [location, setLocation] = useState({
     latitude: LATITUDE,
     longitude: LONGITUDE,
   });
+
+  const [propertyMarkers, setPropertyMarkers] = useState([]);
 
   // Current Weather Data
   const [weatherData, setWeather] = useState({
@@ -58,6 +63,13 @@ const App = () => {
       .catch(err => {
         console.error(err);
       });
+  };
+
+  // Fetch properties
+  const fetchProperties = async () => {
+    return getProperties(location).then(properties =>
+      setPropertyMarkers(properties),
+    );
   };
 
   useEffect(() => {
@@ -102,12 +114,13 @@ const App = () => {
         });
     };
 
-    // sendLocation();
-
     // Get Weather and update intermittently every 5 minutes
     const weather_url = `https://api.weatherapi.com/v1/current.json?key=9bb972c1338243fea82161415213011&q=${location.latitude},${location.longitude}&aqi=no`;
 
     getWeatherData(weather_url);
+
+    // Fetch properties
+    getProperties(location).then(properties => setPropertyMarkers(properties));
 
     setInterval(() => {
       getWeatherData(weather_url);
@@ -172,13 +185,34 @@ const App = () => {
           latitudeDelta: LATITUDE_DELTA,
           longitudeDelta: LONGITUDE_DELTA,
         }}
+        initialRegion={{
+          ...location,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        }}
         showsUserLocation={true}
+        followsUserLocation={true}
         showsMyLocationButton={true}>
+        {propertyMarkers.map(property => {
+          return (
+            <Marker
+              key={property._id}
+              coordinate={{
+                latitude: property._source.latitude,
+                longitude: property._source.longitude,
+              }}
+              // title={property.name}
+              // description={property.description}
+            />
+          );
+        })}
         <Heatmap
           points={points.data}
           radius={50}
-          opacity={0.8}
+          opacity={1}
           gradient={heatmap_grad}
+          gradientSmoothing={10}
+          heatmapMode={'POINTS_DENSITY'}
         />
       </MapView>
 
