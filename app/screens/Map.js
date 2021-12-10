@@ -23,7 +23,7 @@ const WEATHER_UPDATE = 1000 * 60 * 5; // 5 minutes
 const App = () => {
   const heatmap_grad = {
     colors: ['lightblue', 'yellow', 'red'],
-    startPoints: [0.005, 0.33, 0.66],
+    startPoints: [0.03, 0.33, 0.66],
     colorMapSize: 256,
   };
 
