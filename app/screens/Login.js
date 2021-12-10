@@ -1,70 +1,64 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
+  Text,
   KeyboardAvoidingView,
   TextInput,
-  Text,
 } from 'react-native';
 import Theme from '../config/Theme';
+import {validate} from '../config/validation';
 import Button from '../components/Button';
-import validate from '../config/validation';
 import ButtonLink from '../components/ButtonLink';
 import useAuth from '../hooks/useAuth';
 
-export default function Register({navigation}) {
-  const [name, setName] = useState('');
+export default function LoginScreen({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [emailError, setEmailError] = useState(null);
+  const [isDisabled, setIsDisabled] = useState(true);
 
-  const {register, isLoading} = useAuth();
-
-  const onNameChange = value => {
-    setName(value);
-  };
+  const {login, isLoading} = useAuth();
 
   const onEmailChange = value => {
     setEmail(value);
-    setEmailError(validate(value, 'email', true));
+    setEmailError(validate(value, 'email'));
   };
 
   const onPasswordChange = value => {
     setPassword(value);
-    setPasswordError(validate(value, 'password', true));
   };
 
-  const handleRegister = async () => {
-    await register({name, email, password});
+  const handleLogin = async () => {
+    if (!emailError) {
+      await login({email, password});
+    }
   };
+
+  useEffect(() => {
+    setIsDisabled(emailError || !email.length || !password.length);
+  }, [emailError, email, password]);
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.body}>
         <View style={styles.form}>
-          <Text style={styles.heroText}>
-            Get prices and weather across England and Wales
-          </Text>
+          <Text style={styles.heroText}>Welcome Back!</Text>
           <Text style={styles.leadingText}>
-            It's as easy as zooming and tapping, the rest is taken care of.
-            Takes less than a minute to register.
+            Login to continue to Hot Props. If you don't have an account, please
+            register.
           </Text>
 
           <View style={styles.controlsContainer}>
             <TextInput
-              value={name}
-              placeholder="Full name"
-              style={styles.inputControl}
-              onChangeText={onNameChange}
-            />
-            <TextInput
               style={styles.inputControl}
               value={email}
               placeholder="Email"
+              keyboardType="email-address"
               onChangeText={onEmailChange}
             />
             {!!emailError && <Text style={styles.errorText}>{emailError}</Text>}
+
             <TextInput
               style={styles.inputControl}
               value={password}
@@ -72,28 +66,24 @@ export default function Register({navigation}) {
               secureTextEntry
               onChangeText={onPasswordChange}
             />
-            {!!passwordError && (
-              <Text style={styles.errorText}>{passwordError}</Text>
-            )}
           </View>
         </View>
 
         <View style={styles.btnContainer}>
           <Button
-            onClick={handleRegister}
-            disabled={
-              emailError || passwordError || !email.length || !password.length
-            }
-            primary
-            loading={isLoading}>
-            Register
+            onClick={handleLogin}
+            disabled={isDisabled}
+            loading={isLoading}
+            primary={true}>
+            Login
           </Button>
           <View style={styles.btnLinkText}>
-            <Text style={styles.loginText}>Already have an account? </Text>
-            <ButtonLink onClick={() => navigation.navigate('Login')}>
-              Login
+            <Text style={styles.registerText}>Don't have an account? </Text>
+            <ButtonLink onClick={() => navigation.navigate('Register')}>
+              Register
             </ButtonLink>
           </View>
+          {/* <Button onClick={onRegister}>Register</Button> */}
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -125,8 +115,10 @@ const styles = StyleSheet.create({
     width: '95%',
     color: Theme.gray,
   },
-  btnContainer: {
-    width: '100%',
+  logo: {
+    width: '40%',
+    height: undefined,
+    aspectRatio: 1,
   },
   container: {
     backgroundColor: Theme.background,
@@ -140,13 +132,17 @@ const styles = StyleSheet.create({
   },
   inputControl: {
     width: '100%',
-    backgroundColor: Theme.lightGray,
+    backgroundColor: Theme.secondary,
     paddingTop: 15,
     paddingBottom: 15,
     paddingLeft: 10,
     paddingRight: 10,
-    marginTop: 20,
+    marginTop: 15,
     borderRadius: 5,
+  },
+  btnContainer: {
+    width: '100%',
+    marginTop: 'auto',
   },
   btnLinkText: {
     marginTop: 15,
@@ -154,7 +150,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'baseline',
   },
-  loginText: {
+  registerText: {
     textAlign: 'left',
     color: Theme.white,
   },

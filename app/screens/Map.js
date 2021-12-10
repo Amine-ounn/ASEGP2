@@ -1,15 +1,21 @@
 import React from 'react';
 import {useEffect, useState} from 'react';
-import MapView, {PROVIDER_GOOGLE, Marker, Heatmap} from 'react-native-maps';
+import MapView, {
+  PROVIDER_GOOGLE,
+  Heatmap,
+  Marker,
+  Callout,
+} from 'react-native-maps';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {StyleSheet, Platform, View, Text, Alert, Image} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-import axios from 'axios';
-import {getUniqueId} from 'react-native-device-info';
 import points from '../config/postal_sectors';
 import Theme from '../config/Theme';
-const LATITUDE = 50.8677;
-const LONGITUDE = -0.0866;
+import {getProperties} from '../api/properties';
+import {getAddress} from '../utils/misc';
+
+const LATITUDE = 51.503244;
+const LONGITUDE = -0.129778;
 const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = 0.0121;
 const WEATHER_UPDATE = 1000 * 60 * 5; // 5 minutes
@@ -20,10 +26,14 @@ const App = () => {
     startPoints: [0.03, 0.33, 0.66],
     colorMapSize: 256,
   };
+
   const [location, setLocation] = useState({
     latitude: LATITUDE,
     longitude: LONGITUDE,
   });
+
+  const [propertyMarkers, setPropertyMarkers] = useState([]);
+  const [displayMarkers, setDisplayMarkers] = useState(true);
 
   // Current Weather Data
   const [weatherData, setWeather] = useState({
@@ -31,7 +41,7 @@ const App = () => {
     region: '',
     temp_c: 0,
     temp_f: 0,
-    icon: '',
+    icon: null,
     cloud: 0,
     wind_mph: 0,
     wind_kph: 0,
@@ -43,7 +53,6 @@ const App = () => {
     return fetch(weather_url)
       .then(response => response.json())
       .then(data => {
-        //console.log(data);
         setWeather({
           name: data.location.name,
           region: data.location.region,
@@ -61,26 +70,6 @@ const App = () => {
       });
   };
 
-  // Update weather intermittently
-  useEffect(() => {
-    let weather_url =
-      'https://api.weatherapi.com/v1/current.json?key=9bb972c1338243fea82161415213011&q=' +
-      location.latitude +
-      ',' +
-      location.longitude +
-      '&aqi=no';
-    getWeatherData(weather_url);
-    setInterval(() => {
-      weather_url =
-        'https://api.weatherapi.com/v1/current.json?key=9bb972c1338243fea82161415213011&q=' +
-        location.latitude +
-        ',' +
-        location.longitude +
-        '&aqi=no';
-      getWeatherData(weather_url);
-    }, WEATHER_UPDATE);
-  }, [location]);
-
   useEffect(() => {
     try {
       handleLocationPermission();
@@ -97,33 +86,42 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const deviceId = getUniqueId();
+    // Get Weather and update intermittently every 5 minutes
+    const weather_url = `https://api.weatherapi.com/v1/current.json?key=9bb972c1338243fea82161415213011&q=${location.latitude},${location.longitude}&aqi=no`;
 
-    // send location to server
-    const sendLocation = async () => {
-      const {latitude, longitude} = location;
+    getWeatherData(weather_url);
 
-      axios
-        .post('https://ase2task3.herokuapp.com/api/create_locations/', {
-          lat: latitude,
-          lng: longitude,
-          MAC: deviceId,
-        })
-        .then()
-        .catch(err => {
-          console.log(err);
-          Alert.alert(
-            'Ooops',
-            'Something went wrong while trying to save location',
-            [
-              {text: 'Try again', onPress: () => sendLocation()},
-              {text: 'Cancel'},
-            ],
-          );
-        });
+    // Fetch properties
+    getProperties(location).then(properties => setPropertyMarkers(properties));
+
+    const prepareMarkersData = async () => {
+      try {
+        const properties = await getProperties(location);
+        const data = await Promise.all(
+          properties.map(async ({_source: property}) => {
+            return {
+              id: property._id,
+              coordinate: {
+                latitude: property.latitude,
+                longitude: property.longitude,
+              },
+              address: await getAddress(property.latitude, property.longitude),
+              price: `${formatPrice(property.avg_price)} GBP`,
+            };
+          }),
+        );
+
+        setPropertyMarkers(data);
+      } catch (e) {
+        Alert.alert('Ooops', 'Something went wrong while fetching properties');
+      }
     };
 
-    sendLocation();
+    prepareMarkersData();
+
+    setInterval(() => {
+      getWeatherData(weather_url);
+    }, WEATHER_UPDATE);
   }, [location]);
 
   const handleLocationPermission = async () => {
@@ -174,18 +172,18 @@ const App = () => {
     return watchId;
   };
 
-  const getCurrentLocation = () => {
-    return Geolocation.getCurrentPosition(
-      position =>
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        }),
-      error => {
-        Alert.alert(error.message);
-      },
-      {enableHighAccuracy: true, useSignificantChanges: true},
+  const formatPrice = price => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  const handleZooming = region => {
+    // calculate the zoom level
+    const lngDelta = region.longitudeDelta;
+    const currentZoomLevel = Math.round(
+      Math.log(360 / lngDelta) / Math.LN2 + 1,
     );
+
+    setDisplayMarkers(currentZoomLevel > 10);
   };
 
   return (
@@ -198,34 +196,54 @@ const App = () => {
           latitudeDelta: LATITUDE_DELTA,
           longitudeDelta: LONGITUDE_DELTA,
         }}
+        initialRegion={{
+          ...location,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        }}
         showsUserLocation={true}
-        showsMyLocationButton={true}>
-        <Marker
-          coordinate={location}
-          title="You"
-          description="This is your current location"
-        />
+        followsUserLocation={true}
+        showsMyLocationButton={true}
+        onRegionChange={handleZooming}>
+        {displayMarkers &&
+          propertyMarkers.map((property, index) => {
+            return (
+              <Marker key={index} coordinate={property.coordinate}>
+                <Callout>
+                  <View>
+                    <Text style={styles.sectionTitle}>Address</Text>
+                    <Text style={styles.calloutText}>{property.address}</Text>
+                    <Text style={styles.calloutText}>{property.price}</Text>
+                  </View>
+                </Callout>
+              </Marker>
+            );
+          })}
         <Heatmap
           points={points.data}
           radius={50}
-          opacity={0.8}
+          opacity={1}
           gradient={heatmap_grad}
+          gradientSmoothing={10}
+          heatmapMode={'POINTS_DENSITY'}
         />
       </MapView>
 
       <View style={styles.modalContainer}>
-        <View style={styles.modal}>
+        <View style={styles.place}>
+          <Text style={styles.sectionTitle}>Current Location</Text>
+          <Text style={[styles.weatherTxt, styles.currentLocation]}>
+            {weatherData.name}
+          </Text>
+        </View>
+        <View style={styles.weather}>
           <View style={styles.cloud}>
             <Image style={styles.icon} source={{uri: weatherData.icon}} />
             <Text style={styles.weatherTxt}> {weatherData.cloud}%</Text>
           </View>
-          <View style={styles.place}>
-            <Text style={styles.weatherTxt}>{weatherData.name}</Text>
-          </View>
           <View style={styles.temp}>
             <Text style={styles.weatherTxt}>
-              {' '}
-              {weatherData.temp_c}C/{weatherData.temp_f}F
+              {weatherData.temp_c}˚C / {weatherData.temp_f}F
             </Text>
           </View>
         </View>
@@ -243,20 +261,22 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-    height: '94%',
+    height: '85%',
   },
-
   modalContainer: {
     flex: 1,
     position: 'absolute',
-    height: '6%',
+    height: '15%',
     width: '100%',
+    justifyContent: 'space-around',
     minHeight: 44,
-    backgroundColor: Theme.background,
     zIndex: 1,
     padding: 5,
+    paddingLeft: 20,
+    paddingRight: 20,
+    backgroundColor: Theme.background,
   },
-  modal: {
+  weather: {
     flex: 1,
     display: 'flex',
     flexDirection: 'row',
@@ -264,6 +284,7 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-between',
     alignContent: 'center',
+    marginBottom: 10,
   },
   cloud: {
     flex: 1,
@@ -273,11 +294,11 @@ const styles = StyleSheet.create({
     width: '15%',
   },
   place: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '70%',
+    marginTop: 10,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    color: Theme.gray,
   },
   temp: {
     flex: 1,
@@ -293,6 +314,18 @@ const styles = StyleSheet.create({
   weatherTxt: {
     fontSize: 15,
     color: Theme.secondary,
+  },
+  calloutText: {
+    fontWeight: '500',
+    marginBottom: 5,
+    fontSize: 14,
+  },
+  tapToSave: {
+    fontSize: 10,
+    marginVertical: 5,
+  },
+  currentLocation: {
+    fontSize: 20,
   },
   lastUpdateLabel: {
     textAlign: 'left',
