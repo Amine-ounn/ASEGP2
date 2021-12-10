@@ -1,14 +1,18 @@
 import React from 'react';
 import {useEffect, useState} from 'react';
-import MapView, {PROVIDER_GOOGLE, Heatmap, Marker} from 'react-native-maps';
+import MapView, {
+  PROVIDER_GOOGLE,
+  Heatmap,
+  Marker,
+  Callout,
+} from 'react-native-maps';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {StyleSheet, Platform, View, Text, Alert, Image} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-import axios from 'axios';
-import {getUniqueId} from 'react-native-device-info';
 import points from '../config/postal_sectors';
 import Theme from '../config/Theme';
 import {getProperties} from '../api/properties';
+import axios from 'axios';
 
 const LATITUDE = 51.503244;
 const LONGITUDE = -0.129778;
@@ -88,32 +92,6 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const deviceId = getUniqueId();
-
-    // send location to server
-    const sendLocation = async () => {
-      const {latitude, longitude} = location;
-
-      axios
-        .post('https://ase2task3.herokuapp.com/api/create_locations/', {
-          lat: latitude,
-          lng: longitude,
-          MAC: deviceId,
-        })
-        .then()
-        .catch(err => {
-          console.log(err);
-          Alert.alert(
-            'Ooops',
-            'Something went wrong while trying to save location',
-            [
-              {text: 'Try again', onPress: () => sendLocation()},
-              {text: 'Cancel'},
-            ],
-          );
-        });
-    };
-
     // Get Weather and update intermittently every 5 minutes
     const weather_url = `https://api.weatherapi.com/v1/current.json?key=9bb972c1338243fea82161415213011&q=${location.latitude},${location.longitude}&aqi=no`;
 
@@ -175,6 +153,23 @@ const App = () => {
     return watchId;
   };
 
+  const formatPrice = price => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  const getAddress = async (latitude, longitude) => {
+    const response = await axios.get(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=
+        ${latitude},${longitude}&key=AIzaSyBDFPa3DBsjSsC37b4lO-wqv-LUColRc4Q`,
+    );
+
+    const address = response.data.results
+      ? response.data.results[0].formatted_address
+      : 'No Address Found';
+
+    return address;
+  };
+
   return (
     <View style={styles.container}>
       <MapView
@@ -200,10 +195,22 @@ const App = () => {
               coordinate={{
                 latitude: property._source.latitude,
                 longitude: property._source.longitude,
-              }}
-              // title={property.name}
-              // description={property.description}
-            />
+              }}>
+              <Callout
+                onPress={() => {
+                  Alert.alert(
+                    'Property Details',
+                    `${property._source.name} \n ${property._source.address}`,
+                  );
+                }}>
+                <View style={styles.callout}>
+                  <Text style={styles.sectionTitle}>Price</Text>
+                  <Text style={styles.calloutText}>
+                    {formatPrice(property._source.avg_price)} GBP
+                  </Text>
+                </View>
+              </Callout>
+            </Marker>
           );
         })}
         <Heatmap
@@ -301,6 +308,13 @@ const styles = StyleSheet.create({
   weatherTxt: {
     fontSize: 15,
     color: Theme.secondary,
+  },
+  callout: {
+    // backgroundColor: Theme.background,
+  },
+  calloutText: {
+    fontWeight: '500',
+    marginBottom: 5,
   },
   currentLocation: {
     fontSize: 20,

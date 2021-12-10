@@ -1,4 +1,5 @@
-import elasticSearchAPI from '../../config/elasticSearch';
+import elasticSearchAPI from '../config/elasticSearch';
+import api from '../config/axiosConfig';
 
 export const getProperties = async (
   {latitude, longitude},
@@ -33,7 +34,20 @@ export const getProperties = async (
 
     return response.data.hits.hits;
   } catch (e) {
-    console.log(e, 'error occured');
+    return e;
+  }
+};
+
+// send location to server
+export const saveProperty = async ({latitude, longitude}) => {
+  try {
+    const response = await api.post('/properties', {
+      latitude,
+      longitude,
+    });
+
+    return response.data;
+  } catch (e) {
     return e;
   }
 };
