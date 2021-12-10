@@ -32,7 +32,9 @@ const App = () => {
     longitude: LONGITUDE,
   });
 
+  const [zoomLevel, setZoomLevel] = useState(15);
   const [propertyMarkers, setPropertyMarkers] = useState([]);
+  const [displayMarkers, setDisplayMarkers] = useState(true);
 
   // Current Weather Data
   const [weatherData, setWeather] = useState({
@@ -173,6 +175,18 @@ const App = () => {
     return address;
   };
 
+  const handleZooming = region => {
+    // calculate the zoom level
+    const latDelta = region.latitudeDelta;
+    const lngDelta = region.longitudeDelta;
+    const currentZoomLevel = Math.round(
+      Math.log(360 / lngDelta) / Math.LN2 + 1,
+    );
+
+    setZoomLevel(currentZoomLevel);
+    setDisplayMarkers(currentZoomLevel > 10);
+  };
+
   return (
     <View style={styles.container}>
       <MapView
@@ -190,33 +204,35 @@ const App = () => {
         }}
         showsUserLocation={true}
         followsUserLocation={true}
-        showsMyLocationButton={true}>
-        {propertyMarkers.map(property => {
-          return (
-            <Marker
-              key={property._id}
-              coordinate={{
-                latitude: property._source.latitude,
-                longitude: property._source.longitude,
-              }}>
-              <Callout
-                onPress={() => {
-                  handleSaveProperty(
-                    property._source.latitude,
-                    property._source.longitude,
-                  );
+        showsMyLocationButton={true}
+        onRegionChange={handleZooming}>
+        {displayMarkers &&
+          propertyMarkers.map(property => {
+            return (
+              <Marker
+                key={property._id}
+                coordinate={{
+                  latitude: property._source.latitude,
+                  longitude: property._source.longitude,
                 }}>
-                <View style={styles.callout}>
-                  <Text style={styles.sectionTitle}>Price</Text>
-                  <Text style={styles.calloutText}>
-                    {formatPrice(property._source.avg_price)} GBP
-                  </Text>
-                  <Text style={styles.tapToSave}>Tap to save property</Text>
-                </View>
-              </Callout>
-            </Marker>
-          );
-        })}
+                <Callout
+                  onPress={() => {
+                    handleSaveProperty(
+                      property._source.latitude,
+                      property._source.longitude,
+                    );
+                  }}>
+                  <View style={styles.callout}>
+                    <Text style={styles.sectionTitle}>Price</Text>
+                    <Text style={styles.calloutText}>
+                      {formatPrice(property._source.avg_price)} GBP
+                    </Text>
+                    <Text style={styles.tapToSave}>Tap to save property</Text>
+                  </View>
+                </Callout>
+              </Marker>
+            );
+          })}
         <Heatmap
           points={points.data}
           radius={50}
