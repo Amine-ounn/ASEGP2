@@ -1,6 +1,6 @@
 import React from 'react';
 import {useEffect, useState} from 'react';
-import MapView, {PROVIDER_GOOGLE, Marker, Heatmap} from 'react-native-maps';
+import MapView, {PROVIDER_GOOGLE, Heatmap} from 'react-native-maps';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {StyleSheet, Platform, View, Text, Alert, Image} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
@@ -174,11 +174,6 @@ const App = () => {
         }}
         showsUserLocation={true}
         showsMyLocationButton={true}>
-        <Marker
-          coordinate={location}
-          title="You"
-          description="This is your current location"
-        />
         <Heatmap
           points={points.data}
           radius={50}
