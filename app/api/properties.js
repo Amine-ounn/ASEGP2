@@ -39,11 +39,17 @@ export const getProperties = async (
 };
 
 // send location to server
-export const saveProperty = async ({latitude, longitude}) => {
+export const saveProperty = async ({latitude, longitude, id, name}) => {
   try {
+    if (!name) {
+      name = id;
+    }
+
     const response = await api.post('save_location/', {
-      latitude,
-      longitude,
+      lat: latitude,
+      lng: longitude,
+      MAC: id,
+      name,
     });
 
     return response.data;

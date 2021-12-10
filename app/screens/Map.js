@@ -11,8 +11,8 @@ import {StyleSheet, Platform, View, Text, Alert, Image} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import points from '../config/postal_sectors';
 import Theme from '../config/Theme';
-import {getProperties, saveProperty} from '../api/properties';
-import axios from 'axios';
+import {getProperties} from '../api/properties';
+import {getAddress} from '../utils/misc';
 
 const LATITUDE = 51.503244;
 const LONGITUDE = -0.129778;
@@ -32,7 +32,6 @@ const App = () => {
     longitude: LONGITUDE,
   });
 
-  const [zoomLevel, setZoomLevel] = useState(15);
   const [propertyMarkers, setPropertyMarkers] = useState([]);
   const [displayMarkers, setDisplayMarkers] = useState(true);
 
@@ -95,6 +94,31 @@ const App = () => {
     // Fetch properties
     getProperties(location).then(properties => setPropertyMarkers(properties));
 
+    const prepareMarkersData = async () => {
+      try {
+        const properties = await getProperties(location);
+        const data = await Promise.all(
+          properties.map(async ({_source: property}) => {
+            return {
+              id: property._id,
+              coordinate: {
+                latitude: property.latitude,
+                longitude: property.longitude,
+              },
+              address: await getAddress(property.latitude, property.longitude),
+              price: `${formatPrice(property.avg_price)} GBP`,
+            };
+          }),
+        );
+
+        setPropertyMarkers(data);
+      } catch (e) {
+        Alert.alert('Ooops', 'Something went wrong while fetching properties');
+      }
+    };
+
+    prepareMarkersData();
+
     setInterval(() => {
       getWeatherData(weather_url);
     }, WEATHER_UPDATE);
@@ -131,16 +155,6 @@ const App = () => {
     }
   };
 
-  const handleSaveProperty = async (latitude, longitude) => {
-    const response = await saveProperty({latitude, longitude});
-
-    if (response.status === 200) {
-      Alert.alert('Success', 'Property saved successfully');
-    } else {
-      Alert.alert('Ooops', 'Something went wrong, please try again later');
-    }
-  };
-
   const trackUserLocation = () => {
     // will track the user location
     const watchId = Geolocation.watchPosition(
@@ -162,28 +176,13 @@ const App = () => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
-  const getAddress = async (latitude, longitude) => {
-    const response = await axios.get(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=
-        ${latitude},${longitude}&key=AIzaSyBDFPa3DBsjSsC37b4lO-wqv-LUColRc4Q`,
-    );
-
-    const address = response.data.results
-      ? response.data.results[0].formatted_address
-      : 'No Address Found';
-
-    return address;
-  };
-
   const handleZooming = region => {
     // calculate the zoom level
-    const latDelta = region.latitudeDelta;
     const lngDelta = region.longitudeDelta;
     const currentZoomLevel = Math.round(
       Math.log(360 / lngDelta) / Math.LN2 + 1,
     );
 
-    setZoomLevel(currentZoomLevel);
     setDisplayMarkers(currentZoomLevel > 10);
   };
 
@@ -207,27 +206,14 @@ const App = () => {
         showsMyLocationButton={true}
         onRegionChange={handleZooming}>
         {displayMarkers &&
-          propertyMarkers.map(property => {
+          propertyMarkers.map((property, index) => {
             return (
-              <Marker
-                key={property._id}
-                coordinate={{
-                  latitude: property._source.latitude,
-                  longitude: property._source.longitude,
-                }}>
-                <Callout
-                  onPress={() => {
-                    handleSaveProperty(
-                      property._source.latitude,
-                      property._source.longitude,
-                    );
-                  }}>
-                  <View style={styles.callout}>
-                    <Text style={styles.sectionTitle}>Price</Text>
-                    <Text style={styles.calloutText}>
-                      {formatPrice(property._source.avg_price)} GBP
-                    </Text>
-                    <Text style={styles.tapToSave}>Tap to save property</Text>
+              <Marker key={index} coordinate={property.coordinate}>
+                <Callout>
+                  <View>
+                    <Text style={styles.sectionTitle}>Address</Text>
+                    <Text style={styles.calloutText}>{property.address}</Text>
+                    <Text style={styles.calloutText}>{property.price}</Text>
                   </View>
                 </Callout>
               </Marker>
@@ -329,13 +315,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: Theme.secondary,
   },
-  callout: {
-    // backgroundColor: Theme.background,
-  },
   calloutText: {
     fontWeight: '500',
     marginBottom: 5,
-    fontSize: 20,
+    fontSize: 14,
   },
   tapToSave: {
     fontSize: 10,
