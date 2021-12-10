@@ -12,6 +12,7 @@ export const Button = ({
   onClick,
   disabled,
   loading,
+  small,
   primary = false,
   style,
   ...props
@@ -25,6 +26,7 @@ export const Button = ({
         styles.btnBase,
         primary ? styles.btnPrimary : styles.btnSecondary,
         style,
+        small ? styles.btnSmall : null,
         disabled && styles.btnDisabled,
       ]}>
       <Text style={primary ? styles.btnPrimaryText : styles.btnSecondaryText}>
@@ -51,6 +53,12 @@ const styles = StyleSheet.create({
   },
   btnDisabled: {
     backgroundColor: Theme.gray,
+  },
+  btnSmall: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 5,
+    paddingRight: 5,
   },
   btnPrimaryText: {
     color: Theme.secondary,
